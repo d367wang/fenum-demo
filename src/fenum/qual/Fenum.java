@@ -21,5 +21,5 @@ import org.checkerframework.framework.qual.SubtypeOf;
 public @interface Fenum {
     String value();
 
-    FenumPattern pattern() default FenumPattern.UNCHECKED;
+  //FenumPattern pattern() default FenumPattern.UNCHECKED;
 }

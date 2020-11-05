@@ -9,6 +9,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
+import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.SwitchTree;
 import com.sun.source.tree.Tree;
@@ -35,11 +36,17 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclared
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedExecutableType;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
+import org.checkerframework.framework.type.ElementAnnotationApplier;
+import org.checkerframework.javacutil.ElementUtils;
+import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedExecutableType;
+import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedTypeVariable;
+
+
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
-
+import org.checkerframework.javacutil.TypeAnnotationUtils;
 
 public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTypeFactory> {
 
@@ -63,7 +70,7 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
 
     @Override
     public void processClassTree(ClassTree classTree) {
-
+      /*
         TypeElement elt = TreeUtils.elementFromDeclaration(classTree);
         IntDef anno = elt.getAnnotation(IntDef.class);
         if (anno != null) {
@@ -107,6 +114,7 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
             }
             fenumSet.setValidated(true);
         }
+      */ 
         super.processClassTree(classTree);
     }
 
@@ -121,6 +129,34 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
     }
 
 
+  /*
+  @Override
+  public Void visitMethod(MethodTree node, Void p) {
+    final ExecutableElement methodElem = TreeUtils.elementFromDeclaration(node);
+    TypeMirror tm = methodElem.asType();
+    TypeMirror unannotated = TypeAnnotationUtils.unannotatedType(tm);
+    System.out.println("\n\nannotated type mirror: " + tm.toString());
+    System.out.println("unannotated type mirror: " + unannotated.toString());
+
+    AnnotatedTypeMirror type = AnnotatedTypeMirror.createType(unannotated, atypeFactory, ElementUtils.isTypeDeclaration(methodElem));
+    List<AnnotatedTypeVariable> typeVar = ((AnnotatedExecutableType)type).getTypeVariables();
+    
+    System.out.println("get type variable:");
+    if (typeVar.size() != 0) {
+      for(AnnotatedTypeVariable tv : typeVar) {
+        System.out.println(tv.toString());
+      }
+    } else {
+      System.out.println("get no variable");
+    }
+
+    //ElementAnnotationApplier.apply(type, methodElem, atypeFactory);
+    return super.visitMethod(node, p);
+        
+  }
+  */
+
+  
     @Override
     public Void visitMethod(MethodTree node, Void p) {
         final ExecutableElement methodElem = TreeUtils.elementFromDeclaration(node);
@@ -135,6 +171,7 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
         }
         return super.visitMethod(node, p);
     }
+  
 
     @Override
     public Void visitLiteral(LiteralTree node, Void p) {
@@ -142,28 +179,49 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
 
     }
 
+  
+  /*
+    @Override
+    public Void visitAssignment(AssignmentTree node, Void p) {
+      System.out.println("visit assignmentTree");
+      ExpressionTree var = node.getVariable();
+      ExpressionTree expr = node.getExpression();
+
+      System.out.println("annotated type factory: " + atypeFactory.getClass().getSimpleName());
+          
+      AnnotatedTypeMirror varType = atypeFactory.getAnnotatedType(var);
+      //AnnotatedTypeMirror exprType = atypeFactory.getAnnotatedType(expr);
+      AnnotatedTypeMirror exprType =  atypeFactory.getAnnotatedType(TreeUtils.elementFromUse(expr));
+      
+      System.out.println("var " + var.toString() + ", atm: " + varType.toString());
+      System.out.println("expr " + expr.toString() + ", atm: " + exprType.toString());
+      return super.visitAssignment(node, p);
+          
+    }
+  */
+  
+
     @Override
     public Void visitSwitch(SwitchTree node, Void p) {
         ExpressionTree expr = node.getExpression();
         AnnotatedTypeMirror exprType = atypeFactory.getAnnotatedType(expr);
 
-        System.out.println("switch expr " + expr.toString() + ": ");
+        /*
+        System.out.println("\n\nswitch expr " + expr.toString() + ": ");
+        System.out.println("atm: " + exprType.toString());
+        System.out.println("underlying type: " + exprType.getUnderlyingType().toString() + ", " + exprType.getUnderlyingType().getClass().getSimpleName());
+        System.out.println("\n");
+        */
         
         for (CaseTree caseExpr : node.getCases()) {
             ExpressionTree realCaseExpr = caseExpr.getExpression();
             if (realCaseExpr != null) {
                 AnnotatedTypeMirror caseType = atypeFactory.getAnnotatedType(realCaseExpr);
 
-                System.out.println("case expr " + caseExpr.toString() + ": ");
-
                 /*
-                if (exprType.equals(caseType)) {
-                  System.out.println(exprType + " equals to " + caseType + "\n");
-                                  
-                } else {
-                  System.out.println(exprType + " not equals to " + caseType + "\n");
-                                  
-                  } */
+                System.out.println("case expr " + realCaseExpr.toString() + ": ");
+                System.out.println("atm: " + caseType.toString());
+                System.out.println("underlying type: " + caseType.getUnderlyingType().toString() + ", " + caseType.getUnderlyingType().getClass().getSimpleName());
 
                 boolean sameUnderlyingType = exprType.getUnderlyingType().equals(caseType.getUnderlyingType());
                 if (sameUnderlyingType) {
@@ -171,9 +229,6 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
                                   
                 } else {
                   System.out.println("underlying type not same");
-                  System.out.println("switch expr: " + exprType.getUnderlyingType().getClass().getSimpleName());
-                  System.out.println("case expr: " + caseType.getUnderlyingType().getClass().getSimpleName());
-                                  
                 }
 
                 boolean arePrimeAnnosEqual = AnnotationUtils.areSame(exprType.getAnnotations(), caseType.getAnnotations());
@@ -184,7 +239,8 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
                   System.out.println("Prime Annos not Equal");
                                   
                 }
-                
+                System.out.println("");
+                 */
                 
                 areEqual(exprType, caseType, "equality.constraint.unsatisfiable", caseExpr);
                 
@@ -220,15 +276,16 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
 
     @Override
     public Void visitBinary(BinaryTree node, Void p) {
+        AnnotatedTypeMirror lhsAtm = atypeFactory.getAnnotatedType(node.getLeftOperand());
+        AnnotatedTypeMirror rhsAtm = atypeFactory.getAnnotatedType(node.getRightOperand());
+
         Kind opKind = node.getKind();
         switch (opKind) {
             case EQUAL_TO:
             case NOT_EQUAL_TO:
                 // The Fenum Checker is only concerned with primitive types, so just check that
                 // the primary annotations are equivalent.
-                AnnotatedTypeMirror lhsAtm = atypeFactory.getAnnotatedType(node.getLeftOperand());
-                AnnotatedTypeMirror rhsAtm = atypeFactory.getAnnotatedType(node.getRightOperand());
-
+                
                 Set<AnnotationMirror> lhs = lhsAtm.getEffectiveAnnotations();
                 Set<AnnotationMirror> rhs = rhsAtm.getEffectiveAnnotations();
                 QualifierHierarchy qualHierarchy = atypeFactory.getQualifierHierarchy();
@@ -239,7 +296,7 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
                 break;
 
             default:
-                //checker.reportError(node, "binary.operation.unsupported", lhsAtm, rhsAtm);
+                checker.reportError(node, "binary.operation.unsupported", lhsAtm, rhsAtm);
 
         }
         return super.visitBinary(node, p);
@@ -262,6 +319,7 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
         }
         return super.visitBinary(node, p);
     }
+    */
 
     @Override
     public Void visitAnnotation(AnnotationTree node, Void p) {
@@ -292,7 +350,6 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
         }
         return super.visitAnnotation(node, p);
     }
-    */
 
 
     /**

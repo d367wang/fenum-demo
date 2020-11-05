@@ -1,33 +1,37 @@
 package fenum;
 
-import fenum.qual.*;
-import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
-import org.checkerframework.common.basetype.BaseTypeChecker;
+import fenum.qual.Fenum;
+import fenum.qual.FenumBottom;
+import fenum.qual.FenumTop;
+import fenum.qual.FenumUnqualified;
 
-import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.framework.util.GraphQualifierHierarchy;
-import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
-
-
-import javax.lang.model.element.AnnotationMirror;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
-import org.checkerframework.javacutil.AnnotationUtils;
-import org.checkerframework.javacutil.AnnotationBuilder;
+import javax.lang.model.element.AnnotationMirror;
 
-public class FenumAnnotatedTypeFactory extends BaseAnnotatedTypeFactory{
+import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
+import org.checkerframework.common.basetype.BaseTypeChecker;
+import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.framework.util.GraphQualifierHierarchy;
+import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
+import org.checkerframework.javacutil.AnnotationBuilder;
+import org.checkerframework.javacutil.AnnotationUtils;
+import org.checkerframework.javacutil.UserError;
+//import org.plumelib.reflection.Signatures;
+
+/** The type factory for the Fenum Checker. */
+public class FenumAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     protected AnnotationMirror FENUM_UNQUALIFIED;
     protected AnnotationMirror FENUM, FENUM_BOTTOM;
 
-
   /**
    * The map that stores all @Fenum("xxx") encountered in the program.
    */
-  protected final Map<String, AnnotationMirror> fenumAnnotationsMap = new HashMap<>();
+  protected final Map<String, AnnotationMirror> fenumAnnotationsMap; 
 
-  
+
     public FenumAnnotatedTypeFactory(BaseTypeChecker checker) {
         super(checker);
 
@@ -35,7 +39,9 @@ public class FenumAnnotatedTypeFactory extends BaseAnnotatedTypeFactory{
         FENUM = AnnotationBuilder.fromClass(elements, Fenum.class);
         FENUM_UNQUALIFIED = AnnotationBuilder.fromClass(elements, FenumUnqualified.class);
 
-        postInit();
+        fenumAnnotationsMap = new HashMap<>();
+
+        this.postInit();
     }
 
     /**
@@ -50,29 +56,32 @@ public class FenumAnnotatedTypeFactory extends BaseAnnotatedTypeFactory{
                         FenumTop.class,
                         Fenum.class,
                         FenumUnqualified.class,
-                        FenumBottom.class);
+                        FenumBottom.class /*,
+                        PolyFenum.class*/);
 
+        /*
         // Load externally defined quals given in the -Aquals and/or -AqualDirs options
-//        String qualNames = checker.getOption("quals");
-//        String qualDirectories = checker.getOption("qualDirs");
-//
-//        // load individually named qualifiers
-//        if (qualNames != null) {
-//            for (String qualName : qualNames.split(",")) {
-//                if (!Signatures.isBinaryName(qualName)) {
-//                    throw new UserError(
-//                            "Malformed qualifier \"%s\" in -Aquals=%s", qualName, qualNames);
-//                }
-//                qualSet.add(loader.loadExternalAnnotationClass(qualName));
-//            }
-//        }
-//
-//        // load directories of qualifiers
-//        if (qualDirectories != null) {
-//            for (String dirName : qualDirectories.split(":")) {
-//                qualSet.addAll(loader.loadExternalAnnotationClassesFromDirectory(dirName));
-//            }
-//        }
+        String qualNames = checker.getOption("quals");
+        String qualDirectories = checker.getOption("qualDirs");
+
+        // load individually named qualifiers
+        if (qualNames != null) {
+            for (String qualName : qualNames.split(",")) {
+                if (!Signatures.isBinaryName(qualName)) {
+                    throw new UserError(
+                            "Malformed qualifier \"%s\" in -Aquals=%s", qualName, qualNames);
+                }
+                qualSet.add(loader.loadExternalAnnotationClass(qualName));
+            }
+        }
+
+        // load directories of qualifiers
+        if (qualDirectories != null) {
+            for (String dirName : qualDirectories.split(":")) {
+                qualSet.addAll(loader.loadExternalAnnotationClassesFromDirectory(dirName));
+            }
+        }
+        */
 
         // TODO: warn if no qualifiers given?
         // Just Fenum("..") is still valid, though...
@@ -134,5 +143,4 @@ public class FenumAnnotatedTypeFactory extends BaseAnnotatedTypeFactory{
     }
         
   }
-
 }
