@@ -13,6 +13,7 @@ public class PageFormatSimple implements Cloneable
       
   }
 
+
   public void setOrientation(int orientation){
     this.orientation = orientation;
       
@@ -27,7 +28,6 @@ public class PageFormatSimple implements Cloneable
       default:
             
     }
-      
   }
 
   

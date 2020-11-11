@@ -43,7 +43,7 @@ public class FenumHelper {
         VariableElement varElement = TreeUtils.elementFromDeclaration(node);
         AnnotatedTypeMirror atm = atypeFactory.getAnnotatedType(node);
         return hasFenumAnnotation(atm)
-                && ElementUtils.isPublic(varElement)
+            //&& ElementUtils.isPublic(varElement)
                 && ElementUtils.isFinal(varElement)
                 && ElementUtils.isStatic(varElement);
     }

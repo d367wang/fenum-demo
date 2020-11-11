@@ -7,6 +7,7 @@ import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.NewArrayTree;
@@ -349,6 +350,13 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
             }
         }
         return super.visitAnnotation(node, p);
+    }
+
+
+    @Override
+    protected boolean skipReceiverSubtypeCheck(MethodInvocationTree node, AnnotatedTypeMirror methodDefinitionReceiver, AnnotatedTypeMirror methodCallReceiver) {
+      return true;
+          
     }
 
 
