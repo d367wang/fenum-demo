@@ -176,32 +176,19 @@ public class FenumVisitor extends InferenceVisitor<FenumChecker, BaseAnnotatedTy
 
     @Override
     public Void visitLiteral(LiteralTree node, Void p) {
-        return super.visitLiteral(node, p);
+        super.visitLiteral(node, p);
+
+        System.out.println("\n=============visiting literal" + node.getValue() + " =====================");
+        AnnotatedTypeMirror atm = atypeFactory.getAnnotatedType(node);
+        System.out.println("atm: " + atm.toString());
+        System.out.println("=========================================================================\n");
+
+        return null;
 
     }
 
   
-  /*
-    @Override
-    public Void visitAssignment(AssignmentTree node, Void p) {
-      System.out.println("visit assignmentTree");
-      ExpressionTree var = node.getVariable();
-      ExpressionTree expr = node.getExpression();
-
-      System.out.println("annotated type factory: " + atypeFactory.getClass().getSimpleName());
-          
-      AnnotatedTypeMirror varType = atypeFactory.getAnnotatedType(var);
-      //AnnotatedTypeMirror exprType = atypeFactory.getAnnotatedType(expr);
-      AnnotatedTypeMirror exprType =  atypeFactory.getAnnotatedType(TreeUtils.elementFromUse(expr));
-      
-      System.out.println("var " + var.toString() + ", atm: " + varType.toString());
-      System.out.println("expr " + expr.toString() + ", atm: " + exprType.toString());
-      return super.visitAssignment(node, p);
-          
-    }
-  */
   
-
     @Override
     public Void visitSwitch(SwitchTree node, Void p) {
         ExpressionTree expr = node.getExpression();

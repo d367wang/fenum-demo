@@ -6,8 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.checkerframework.framework.qual.DefaultFor;
 import org.checkerframework.framework.qual.DefaultQualifierInHierarchy;
+import org.checkerframework.framework.qual.LiteralKind;
 import org.checkerframework.framework.qual.SubtypeOf;
 import org.checkerframework.framework.qual.TypeUseLocation;
+import org.checkerframework.framework.qual.QualifierForLiterals;
 
 /**
  * An unqualified type. Such a type is incomparable to (that is, neither a subtype nor a supertype
@@ -24,4 +26,15 @@ import org.checkerframework.framework.qual.TypeUseLocation;
 @SubtypeOf({FenumTop.class})
 @DefaultQualifierInHierarchy
 @DefaultFor(TypeUseLocation.EXCEPTION_PARAMETER)
+@QualifierForLiterals({
+    //LiteralKind.BOOLEAN,
+    //LiteralKind.CHAR,
+    //LiteralKind.DOUBLE,
+    //LiteralKind.FLOAT,
+        LiteralKind.INT,
+            //LiteralKind.LONG,
+            //LiteralKind.NULL,
+        LiteralKind.STRING,
+        
+        })
 public @interface FenumUnqualified {}
